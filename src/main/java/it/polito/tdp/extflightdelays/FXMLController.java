@@ -3,6 +3,7 @@ package it.polito.tdp.extflightdelays;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,10 +29,10 @@ public class FXMLController {
     private TextField compagnieMinimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxAeroportoPartenza"
-    private ComboBox<?> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
+    private ComboBox<Airport> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxAeroportoDestinazione"
-    private ComboBox<?> cmbBoxAeroportoDestinazione; // Value injected by FXMLLoader
+    private ComboBox<Airport> cmbBoxAeroportoDestinazione; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalizza"
     private Button btnAnalizza; // Value injected by FXMLLoader
@@ -41,12 +42,26 @@ public class FXMLController {
 
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
-
+    	String input = this.compagnieMinimo.getText();
+    	int inputNum;
+    	try {
+    		inputNum = Integer.parseInt(input);
+    	}catch(NumberFormatException e){
+    		this.txtResult.setText("Inserire un numero");
+    		return;
+    	}
+		this.model.creaGrafo(inputNum);
     }
 
     @FXML
     void doTestConnessione(ActionEvent event) {
-
+    	Airport partenza = this.cmbBoxAeroportoPartenza.getValue();
+    	Airport arrivo = this.cmbBoxAeroportoDestinazione.getValue();
+    	if(model.aeroportiConnessi(partenza, arrivo)) {
+    		this.txtResult.setText("Aeroporti connessi");
+    	} else {
+    		this.txtResult.setText("Aeroporti NON connessi");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -62,5 +77,9 @@ public class FXMLController {
 
     public void setModel(Model model) {
     	this.model = model;
+    	for(Airport x : model.getAllAeroporti()) {
+    		this.cmbBoxAeroportoPartenza.getItems().add(x);
+    		this.cmbBoxAeroportoDestinazione.getItems().add(x);
+    	}
     }
 }
